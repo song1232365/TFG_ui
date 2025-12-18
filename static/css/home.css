@@ -10,7 +10,153 @@
     --glass-border: rgba(255, 255, 255, 0.2);  
     --neon-glow: rgba(0, 229, 255, 0.8);  
 }  
+
+/* 顶部控制栏 */  
+.top-controls {  
+    position: fixed;  
+    top: 20px;  
+    left: 50%;  
+    transform: translateX(-50%);  
+    display: flex;  
+    gap: 15px;  
+    z-index: 1000;  
+    background: var(--glass-bg);  
+    padding: 10px 20px;  
+    border-radius: 50px;  
+    border: 1px solid var(--glass-border);  
+    backdrop-filter: blur(10px);  
+    box-shadow: 0 0 20px rgba(0, 229, 255, 0.3);  
+}  
   
+.control-btn {  
+    width: 45px;  
+    height: 45px;  
+    border: none;  
+    border-radius: 50%;  
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));  
+    color: white;  
+    cursor: pointer;  
+    display: flex;  
+    align-items: center;  
+    justify-content: center;  
+    transition: all 0.3s ease;  
+    font-size: 18px;  
+    box-shadow: 0 0 15px rgba(0, 229, 255, 0.4);  
+}  
+  
+.control-btn:hover {  
+    transform: scale(1.1);  
+    box-shadow: 0 0 25px rgba(0, 229, 255, 0.6);  
+}  
+  
+.control-btn:active {  
+    transform: scale(0.95);  
+}  
+  
+.control-btn.active {  
+    background: linear-gradient(135deg, var(--accent-color), var(--primary-color));  
+    box-shadow: 0 0 30px rgba(0, 229, 255, 0.8);  
+}  
+  
+/* 浅色主题变量 */  
+body.light-theme {
+    /* 核心色板：从沉闷蓝改为更有活力的靛蓝/蓝紫/青色渐变 */
+    --primary-color: #6366f1;   /* Indigo */
+    --secondary-color: #8b5cf6; /* Violet */
+    --accent-color: #06b6d4;    /* Cyan */
+    
+    /* 背景：极浅的冷暖色调，避免纯死白 */
+    --bg-dark: #eef2ff;         /* Very light indigo tint */
+    --bg-light: #ffffff;        /* Pure White */
+    
+    /* 文字：深灰蓝，比纯黑更柔和 */
+    --text-primary: #334155;    /* Slate 700 */
+    --text-secondary: rgba(71, 85, 105, 0.75);
+    
+    /* 玻璃拟态：增加不透明度，使用白色磨砂感 */
+    --glass-bg: rgba(255, 255, 255, 0.75);
+    --glass-border: rgba(255, 255, 255, 0.6);
+    
+    /* 专属光晕变量 */
+    --light-shadow: rgba(99, 102, 241, 0.25);
+}
+
+/* 浅色模式背景 - 更加柔和的径向渐变 */
+body.light-theme.main-bg {
+    background: radial-gradient(circle at top left, #e0e7ff 0%, #ffffff 50%, #f3f4f6 100%);
+}
+
+/* 浅色模式下的粒子层 - 降低浓度，改为淡彩色 */
+body.light-theme.main-bg::before {
+    opacity: 0.6; /* 降低粒子整体不透明度，防止显得杂乱 */
+    filter: hue-rotate(20deg); /* 微调色相使其更匹配浅色背景 */
+    mix-blend-mode: multiply; /* 让粒子更好地融入白色背景 */
+}
+
+/* 浅色模式下的3D网格线 - 极其微弱 */
+body.light-theme.main-bg::after {
+    opacity: 0.4;
+    background: 
+        linear-gradient(45deg, transparent 40%, rgba(99, 102, 241, 0.05) 50%, transparent 60%),
+        linear-gradient(-45deg, transparent 40%, rgba(6, 182, 212, 0.05) 50%, transparent 60%);
+}
+
+/* 浅色模式容器 - 类似磨砂玻璃/陶瓷质感 */
+body.light-theme .container {
+    background: rgba(255, 255, 255, 0.65);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 
+        0 20px 50px var(--light-shadow),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.5); /* 内部高光 */
+    backdrop-filter: blur(20px) saturate(180%); /* 提高饱和度让背景透出来的颜色更好看 */
+}
+
+/* 浅色模式按钮 - 更加鲜艳的渐变，去除脏阴影 */
+body.light-theme .button-container button {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    color: white;
+    box-shadow: 
+        0 10px 20px rgba(99, 102, 241, 0.3), /* 投影改为同色系 */
+        0 2px 5px rgba(0,0,0,0.05);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+body.light-theme .button-container button:hover {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    box-shadow: 
+        0 15px 30px rgba(124, 58, 237, 0.4),
+        inset 0 0 10px rgba(255, 255, 255, 0.2);
+    transform: translateY(-3px) scale(1.02);
+}
+
+/* 浅色模式标题 - 渐变色 */
+body.light-theme h1 {
+    background: linear-gradient(135deg, #4f46e5, #06b6d4);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: none; /* 去掉发光，保持清爽 */
+    filter: drop-shadow(0 2px 10px rgba(99, 102, 241, 0.2)); /* 改为柔和投影 */
+}
+
+/* 浅色模式顶部控制栏 */
+body.light-theme .top-controls {
+    background: rgba(255, 255, 255, 0.85);
+    border-color: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+body.light-theme .control-btn {
+    box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3);
+}
+
+/* 浅色模式下的弹动小图标 */
+body.light-theme .bouncing-icon {
+    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+    border: 2px solid white; /* 加个白边更可爱 */
+}
+
 body.main-bg {  
     background: radial-gradient(circle at center, var(--bg-dark) 0%, var(--bg-light) 100%);  
     color: var(--text-primary);  
@@ -125,7 +271,7 @@ body.main-bg::after {
   
 /* 恢复小范围晃动动画 */  
 .bouncing-icon:nth-child(1) {  
-    top: 15%;  
+    top: 20%;  
     left: 10%;  
     animation: bounceFloat 8s ease-in-out infinite;  
 }  
@@ -155,7 +301,7 @@ body.main-bg::after {
 }  
   
 .bouncing-icon:nth-child(5) {  
-    top: 50%;  
+    top: 55%;  
     left: 5%;  
     animation: bounceFloat 12s ease-in-out infinite;  
     animation-delay: 2s;  
@@ -163,7 +309,7 @@ body.main-bg::after {
 }  
   
 .bouncing-icon:nth-child(6) {  
-    top: 40%;  
+    top: 45%;  
     right: 8%;  
     animation: bounceFloat 13s ease-in-out infinite;  
     animation-delay: 5.5s;  
