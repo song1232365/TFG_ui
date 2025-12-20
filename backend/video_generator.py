@@ -88,6 +88,14 @@ def generate_video(data):
             audio_extractor = data.get('audio_extractor', 'deepspeech')  # deepspeech 或 hubert
             gpu_choice = data.get('gpu_choice', 'GPU0')
             
+            # 获取推理参数（方案二：渲染细节等级）
+            inference_params = data.get('inference_params', {})
+            sh_degree = inference_params.get('sh_degree', 2)  # 默认值 2（标准模式）
+            # 验证 sh_degree 范围
+            if sh_degree not in [0, 1, 2, 3]:
+                print(f"[backend.video_generator] 警告：sh_degree={sh_degree} 不在有效范围 [0,1,2,3] 内，使用默认值 2")
+                sh_degree = 2
+            
             # 验证模型路径（自动提取相对路径）
             is_valid, model_path, error_msg = validate_model_path(model_path_raw)
             if not is_valid:
@@ -115,7 +123,8 @@ def generate_video(data):
                 '--out', destination_path,
                 '--extractor', audio_extractor,
                 '--dataset', dataset_path,
-                '--model', model_path
+                '--model', model_path,
+                '--sh_degree', str(sh_degree)  # 渲染细节等级（方案二）
             ]
             
             print(f"[backend.video_generator] 执行命令: {' '.join(cmd)}")

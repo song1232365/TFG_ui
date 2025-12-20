@@ -141,6 +141,26 @@ def chat_response(data):
                 print(f"[backend.chat_engine] 错误：默认参考音频也不存在: {default_ref}")
                 return os.path.join("static", "videos", "chat_response.mp4")
         
+        # 获取 CosyVoice 参数
+        cosyvoice_params = data.get('cosyvoice_params', {})
+        language = cosyvoice_params.get('language', 'zh')  # 语言类型：zh 或 en
+        speed = cosyvoice_params.get('speed', 1.0)  # 方案一：语速调节，默认 1.0
+        
+        # 验证语言类型
+        if language not in ['zh', 'en']:
+            print(f"[backend.chat_engine] 警告：language={language} 不在有效范围 ['zh','en'] 内，使用默认值 'zh'")
+            language = 'zh'
+        
+        # 验证语速参数
+        try:
+            speed = float(speed)
+            if speed < 0.5 or speed > 2.0:
+                print(f"[backend.chat_engine] 警告：speed={speed} 不在有效范围 [0.5, 2.0] 内，使用默认值 1.0")
+                speed = 1.0
+        except (ValueError, TypeError):
+            print(f"[backend.chat_engine] 警告：speed={speed} 不是有效数字，使用默认值 1.0")
+            speed = 1.0
+        
         # 生成克隆音频
         os.makedirs("./static/audios", exist_ok=True)
         tts_output = "./static/audios/tts_output.wav"
@@ -149,7 +169,8 @@ def chat_response(data):
             text=reply_text,
             prompt_wav=voice_clone_ref,
             output_file=tts_output,
-            language='zh'  # 可以根据需要调整
+            language=language,  # 使用前端选择的语言类型
+            speed=speed  # 方案一：语速调节
         )
         
         if not cloned_audio or not os.path.exists(cloned_audio):
@@ -163,6 +184,14 @@ def chat_response(data):
         gpu_choice = data.get('gpu_choice', 'GPU0')
         audio_extractor = data.get('audio_extractor', 'deepspeech')
         
+        # 获取推理参数（方案二：渲染细节等级）
+        inference_params = data.get('inference_params', {})
+        sh_degree = inference_params.get('sh_degree', 2)  # 默认值 2（标准模式）
+        # 验证 sh_degree 范围
+        if sh_degree not in [0, 1, 2, 3]:
+            print(f"[backend.chat_engine] 警告：sh_degree={sh_degree} 不在有效范围 [0,1,2,3] 内，使用默认值 2")
+            sh_degree = 2
+        
         # 调用视频生成
         video_data = {
             'model_name': 'TalkingGaussian',
@@ -170,7 +199,10 @@ def chat_response(data):
             'ref_audio': cloned_audio,
             'dataset_path': dataset_path,
             'gpu_choice': gpu_choice,
-            'audio_extractor': audio_extractor
+            'audio_extractor': audio_extractor,
+            'inference_params': {
+                'sh_degree': sh_degree  # 渲染细节等级（方案二）
+            }
         }
         
         # 导入video_generator模块
@@ -242,7 +274,7 @@ def get_ai_response(input_text, output_text, api_key, model):
         print(f"[backend.chat_engine] LLM调用失败: {e}")
         return None
 
-def text_to_speech_cosyvoice(text, prompt_wav, output_file, language='zh', model_dir=None):
+def text_to_speech_cosyvoice(text, prompt_wav, output_file, language='zh', model_dir=None, speed=1.0):
     """
     使用CosyVoice进行语音克隆
     
@@ -252,6 +284,7 @@ def text_to_speech_cosyvoice(text, prompt_wav, output_file, language='zh', model
         output_file: 输出音频文件路径
         language: 语言类型 ('zh' 或 'en')
         model_dir: CosyVoice模型目录（可选）
+        speed: 语速调节 (0.5-2.0)，1.0为正常速度（方案一：语速调节）
     
     Returns:
         生成的音频文件路径，失败返回None
@@ -285,6 +318,11 @@ def text_to_speech_cosyvoice(text, prompt_wav, output_file, language='zh', model
             print(f"[backend.chat_engine] 找不到CosyVoice脚本: {cosyvoice_script}")
             return None
         
+        # 验证 speed 参数范围
+        if speed < 0.5 or speed > 2.0:
+            print(f"[backend.chat_engine] 警告：speed={speed} 不在有效范围 [0.5, 2.0] 内，使用默认值 1.0")
+            speed = 1.0
+        
         # 构建命令
         cmd = [
             'python', cosyvoice_script,
@@ -293,6 +331,7 @@ def text_to_speech_cosyvoice(text, prompt_wav, output_file, language='zh', model
             '--prompt_text', text[:50],  # 使用文本前50字符作为prompt_text（简化处理）
             '--tts_text', text,
             '--language', language,
+            '--speed', str(speed),  # 方案一：语速调节
             '--output_file', os.path.basename(output_file)
         ]
         
