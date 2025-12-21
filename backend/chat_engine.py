@@ -308,8 +308,8 @@ def text_to_speech_cosyvoice(text, prompt_wav, output_file, language='zh', model
         os.makedirs(os.path.dirname(output_file), exist_ok=True)
         
         # 构建CosyVoice调用命令
-        # test_cosyvoice.py 现在在 CosyVoice 目录下
-        cosyvoice_script = './CosyVoice/test_cosyvoice.py'
+        # 使用Shell脚本封装，脚本内部会使用conda run切换到cosyvoice环境
+        cosyvoice_script = './CosyVoice/run_cosyvoice.sh'
         
         if not os.path.exists(cosyvoice_script):
             print(f"[backend.chat_engine] 找不到CosyVoice脚本: {cosyvoice_script}")
@@ -320,9 +320,9 @@ def text_to_speech_cosyvoice(text, prompt_wav, output_file, language='zh', model
             print(f"[backend.chat_engine] 警告：speed={speed} 不在有效范围 [0.5, 2.0] 内，使用默认值 1.0")
             speed = 1.0
         
-        # 构建命令
+        # 构建命令 - 调用Shell脚本，脚本内部会使用conda run
         cmd = [
-            'python', cosyvoice_script,
+            'bash', cosyvoice_script,
             '--model_dir', model_dir,
             '--prompt_wav', prompt_wav,
             '--prompt_text', text[:50],  # 使用文本前50字符作为prompt_text（简化处理）
@@ -334,12 +334,12 @@ def text_to_speech_cosyvoice(text, prompt_wav, output_file, language='zh', model
         
         print(f"[backend.chat_engine] 执行CosyVoice命令: {' '.join(cmd)}")
         
-        # 执行命令
+        # 执行命令 - 从项目根目录执行
         result = subprocess.run(
             cmd,
             capture_output=True,
             text=True,
-            cwd=os.path.dirname(cosyvoice_script) if os.path.dirname(cosyvoice_script) else '.'
+            cwd='.'
         )
         
         print("CosyVoice标准输出:", result.stdout)

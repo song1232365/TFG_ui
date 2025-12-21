@@ -42,13 +42,15 @@ fi
 
 # We reuse your tested Python pipeline (feature -> synthesize -> trim -> mux)
 # It creates final mp4 in test_result/<basename>_final.mp4
-python test_talkinggaussian.py \
-  --audio_file "$WAV" \
-  --audio_extractor "$EXTRACTOR" \
-  --dataset_path "$DATASET" \
-  --model_path "$MODEL" \
-  --output_dir "test_result" \
-  --sh_degree "$SH_DEGREE"
+# Use conda run to switch to talking_gaussian environment
+conda run -n talking_gaussian --no-capture-output \
+    python test_talkinggaussian.py \
+    --audio_file "$WAV" \
+    --audio_extractor "$EXTRACTOR" \
+    --dataset_path "$DATASET" \
+    --model_path "$MODEL" \
+    --output_dir "test_result" \
+    --sh_degree "$SH_DEGREE"
 
 # Find final file and copy to OUT
 BASENAME="$(basename "$WAV")"

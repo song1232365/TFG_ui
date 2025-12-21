@@ -38,8 +38,9 @@ def train_model(data):
             transforms_file = os.path.join(dataset_path, "transforms_train.json")
             if not os.path.exists(transforms_file):
                 print("[backend.model_trainer] 数据未预处理，开始预处理...")
-                # 执行数据预处理
+                # 执行数据预处理 - 使用conda run切换到talking_gaussian环境
                 preprocess_cmd = [
+                    'conda', 'run', '-n', 'talking_gaussian', '--no-capture-output',
                     'python', 'TalkingGaussian/data_utils/process.py',
                     video_path,
                     '--asr', audio_extractor
