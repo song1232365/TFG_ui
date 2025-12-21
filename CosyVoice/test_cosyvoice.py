@@ -7,8 +7,8 @@ import os
 import argparse
 import torchaudio
 
-sys.path.append('./CosyVoice-main/third_party/Matcha-TTS')
-sys.path.append('./CosyVoice-main')
+sys.path.append('./third_party/Matcha-TTS')
+sys.path.append('.')
 from cosyvoice.cli.cosyvoice import CosyVoice2
 from cosyvoice.utils.file_utils import load_wav
 
@@ -17,10 +17,10 @@ from cosyvoice.utils.file_utils import load_wav
 def main():
     parser = argparse.ArgumentParser(description='CosyVoice 语音克隆工具')
     parser.add_argument('--model_dir', 
-                        default='./CosyVoice-main/pretrained_models/CosyVoice2-0.5B',
+                        default='./pretrained_models/CosyVoice2-0.5B',
                         help='模型目录路径')
     parser.add_argument('--prompt_wav', 
-                        default='./CosyVoice-main/asset/zero_shot_prompt.wav',
+                        default='./asset/zero_shot_prompt.wav',
                         help='语音源文件路径')
     parser.add_argument('--prompt_text',
                         default='希望你以后能够做的比我还好呦。',

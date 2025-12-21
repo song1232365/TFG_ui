@@ -2,12 +2,12 @@
 """Run CosyVoice2 zero-shot voice cloning for May (English).
 
 Defaults match TalkingGaussian's test_result assets:
-- prompt wav:  /root/TalkingGaussian/test_result/may_prompt.wav
-- prompt text: /root/TalkingGaussian/test_result/may_prompt_en.txt
-- tts text:    /root/TalkingGaussian/test_result/tts_text_en.txt
+- prompt wav:  ../TalkingGaussian/test_result/may_prompt.wav
+- prompt text: ../TalkingGaussian/test_result/may_prompt_en.txt
+- tts text:    ../TalkingGaussian/test_result/tts_text_en.txt
 
 Output:
-- /root/TalkingGaussian/test_result/may_tts_en.wav
+- ../TalkingGaussian/test_result/may_tts_en.wav
 
 Usage:
   python3 run_may_en.py
@@ -38,26 +38,26 @@ def main() -> int:
     parser.add_argument(
         "--model_dir",
         default="pretrained_models/CosyVoice2-0.5B",
-        help="CosyVoice2 model directory (relative to CosyVoice-main).",
+        help="CosyVoice2 model directory (relative to CosyVoice root).",
     )
     parser.add_argument(
         "--prompt_wav",
-        default="/root/TalkingGaussian/test_result/may_prompt.wav",
+        default="../TalkingGaussian/test_result/may_prompt.wav",
         help="Reference prompt wav path.",
     )
     parser.add_argument(
         "--prompt_text",
-        default="/root/TalkingGaussian/test_result/may_prompt_en.txt",
+        default="../TalkingGaussian/test_result/may_prompt_en.txt",
         help="Transcript text for prompt wav.",
     )
     parser.add_argument(
         "--tts_text",
-        default="/root/TalkingGaussian/test_result/tts_text_en.txt",
+        default="../TalkingGaussian/test_result/tts_text_en.txt",
         help="Target text to synthesize.",
     )
     parser.add_argument(
         "--out_wav",
-        default="/root/TalkingGaussian/test_result/may_tts_en.wav",
+        default="../TalkingGaussian/test_result/may_tts_en.wav",
         help="Output wav path.",
     )
     parser.add_argument(

@@ -1,3 +1,7 @@
+第3组
+组长：崔思睿
+组员：卢一博 孙杭 赵海林 高曼 邓清月 张语桐 高兴
+
 # TalkingGaussian: Structure-Persistent 3D Talking Head Synthesis via Gaussian Splatting
 
 This is the official repository for our ECCV 2024 paper **TalkingGaussian: Structure-Persistent 3D Talking Head Synthesis via Gaussian Splatting**.
@@ -147,11 +151,11 @@ We provide a small offline ASR helper to generate a draft transcript for manual 
 pip install -r requirements_asr.txt
 
 # download a Vosk model from https://alphacephei.com/vosk/models and unzip it, e.g.:
-#   CosyVoice-main/asset/vosk-model-small-cn-0.22
+#   ../CosyVoice/asset/vosk-model-small-cn-0.22
 
 python scripts/asr_transcribe.py \
   --input test_result/may_prompt.wav \
-  --model_dir CosyVoice-main/asset/vosk-model-small-cn-0.22 \
+  --model_dir ../CosyVoice/asset/vosk-model-small-cn-0.22 \
   --out_text test_result/may_prompt.txt
 ```
 ```

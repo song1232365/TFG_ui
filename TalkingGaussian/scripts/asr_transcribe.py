@@ -49,7 +49,7 @@ def transcribe_vosk(wav16k_path: str, model_dir: str, words: bool = False):
             "Examples:\n"
             "  Chinese: https://alphacephei.com/vosk/models\n"
             "  English: https://alphacephei.com/vosk/models\n"
-            "Then unzip to e.g. CosyVoice-main/asset/vosk-model-small-cn-0.22"
+            "Then unzip to e.g. ../CosyVoice/asset/vosk-model-small-cn-0.22"
         )
 
     model = Model(model_dir)
@@ -87,7 +87,7 @@ def main():
     parser.add_argument(
         "--model_dir",
         default="",
-        help="Path to Vosk model directory (unzipped). Example: CosyVoice-main/asset/vosk-model-small-cn-0.22",
+        help="Path to Vosk model directory (unzipped). Example: ../CosyVoice/asset/vosk-model-small-cn-0.22",
     )
     parser.add_argument("--out_text", default="", help="Write transcript text to this file")
     parser.add_argument("--out_json", default="", help="Write raw Vosk results json to this file")
