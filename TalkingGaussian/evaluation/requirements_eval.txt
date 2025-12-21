@@ -1,0 +1,8 @@
+# Optional evaluation dependencies
+# SSIM/NIQE are already satisfied if scikit-image is installed.
+# LPIPS is already in environment.yml.
+clean-fid
+# torch-fidelity
+
+# NIQE fallback for older scikit-image
+piq
