@@ -1,0 +1,75 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+build/
+dist/
+.Python
+
+# Conda/Python 环境（不需要打包到镜像）
+.conda/
+env/
+venv/
+*.conda
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# 测试数据和临时文件
+test_data/
+*.log
+*.tmp
+
+# 评估工作目录（运行时生成）
+TalkingGaussian/evaluation/_work/
+TalkingGaussian/test_result/
+CosyVoice/test_result/
+
+# 运行时生成的视频/音频/文本文件（排除所有）
+static/videos/*.mp4
+static/audios/*.wav
+static/text/*.txt
+
+# 保留前端需要的示例/占位文件
+!static/videos/out.mp4
+!static/videos/train_result.mp4
+!static/videos/chat_response.mp4
+
+# 模型输出（运行时生成）
+TalkingGaussian/output/
+SyncTalk/model/
+
+# 预训练模型（如果太大，建议通过 volume 挂载）
+# CosyVoice/pretrained_models/
+# TalkingGaussian/third_party/
+
+# 上传文件（运行时生成）
+static/uploads/
+
+# API 配置文件（敏感信息，运行时挂载或环境变量）
+backend/config/api_config.json
+
+# Docker 相关
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# 文档（可选，如果镜像大小有限制可以排除）
+*.md
+docs/
+
+# 其他
+.cache/
+*.cache
+

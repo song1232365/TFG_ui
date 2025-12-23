@@ -1,0 +1,23 @@
+# TalkingGaussian UI System - Evaluation Dockerfile
+# 评测专用镜像（复用主镜像，只是入口不同）
+# 使用方法：docker run --gpus all -v /path/to/pred:/app/pred -v /path/to/gt:/app/gt tfg_ui:eval
+
+FROM tfg_ui:latest
+
+# 设置工作目录
+WORKDIR /app
+
+# 复制评测脚本
+COPY TalkingGaussian/evaluation/ /app/TalkingGaussian/evaluation/
+COPY TalkingGaussian/evaluation/run_all_metrics.sh /app/run_eval.sh
+
+# 设置权限
+RUN chmod +x /app/run_eval.sh && \
+    chmod +x TalkingGaussian/evaluation/*.sh 2>/dev/null || true
+
+# 默认命令：运行评测脚本
+# 使用方法：docker run --gpus all -v /path/to/pred:/app/pred -v /path/to/gt:/app/gt tfg_ui:eval
+# 或者：docker run --gpus all tfg_ui:eval --pred_dir /app/pred --gt_dir /app/gt
+ENTRYPOINT ["/app/run_eval.sh"]
+
+

@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  # 主服务：Flask UI + 训练 + 推理 + 实时对话
+  tfg_ui:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: tfg_ui:latest
+    container_name: tfg_ui
+    ports:
+      - "5001:5001"
+    volumes:
+      # 数据目录（训练视频、生成的视频等）
+      - ./static:/app/static
+      - ./TalkingGaussian/data:/app/TalkingGaussian/data
+      - ./TalkingGaussian/output:/app/TalkingGaussian/output
+      - ./TalkingGaussian/test_result:/app/TalkingGaussian/test_result
+      - ./CosyVoice/test_result:/app/CosyVoice/test_result
+      # API 配置（可选，如果不想在镜像中硬编码）
+      - ./backend/config:/app/backend/config
+    environment:
+      - CUDA_VISIBLE_DEVICES=0
+      - FLASK_ENV=production
+      - TZ=Asia/Shanghai
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    restart: unless-stopped
+    command: python app.py
+
+  # 评测服务（可选，独立运行评测）
+  tfg_eval:
+    build:
+      context: .
+      dockerfile: Dockerfile.eval
+    image: tfg_ui:eval
+    container_name: tfg_eval
+    volumes:
+      # 预测结果目录
+      - ./evaluation_pred:/app/pred
+      # 真实视频目录
+      - ./evaluation_gt:/app/gt
+      # 评测输出
+      - ./evaluation_output:/app/output
+    environment:
+      - CUDA_VISIBLE_DEVICES=0
+      - TZ=Asia/Shanghai
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    # 默认不启动，需要时手动运行：docker-compose run tfg_eval --pred_dir /app/pred --gt_dir /app/gt
+    profiles:
+      - eval
+
+
