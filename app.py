@@ -56,7 +56,9 @@ def train_model_async(data, task_id):
                 'status': result.get('status', 'error'),
                 'model_path': result.get('model_path'),
                 'message': result.get('message', ''),
-                'preview_video': result.get('preview_video')
+                'preview_video': result.get('preview_video'),
+                'reference_audio': result.get('reference_audio'),
+                'reference_audio_short': result.get('reference_audio_short')
             }
         else:
             # 兼容旧返回：只返回路径则认为成功
@@ -64,7 +66,9 @@ def train_model_async(data, task_id):
                 'status': 'success',
                 'model_path': result,
                 'message': f'训练完成，模型路径：{result}',
-                'preview_video': None
+                'preview_video': None,
+                'reference_audio': None,
+                'reference_audio_short': None
             }
     except Exception as e:
         training_tasks[task_id] = {

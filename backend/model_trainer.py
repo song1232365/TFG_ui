@@ -3,13 +3,39 @@ import os
 import time
 import shutil
 
-def _resp(status, model_path=None, message="", preview_video=None):
+def _resp(status, model_path=None, message="", preview_video=None, reference_audio=None, reference_audio_short=None):
     return {
         "status": status,
         "model_path": model_path,
         "message": message,
-        "preview_video": preview_video
+        "preview_video": preview_video,
+        "reference_audio": reference_audio,
+        "reference_audio_short": reference_audio_short
     }
+
+
+def _trim_audio(src_path, dst_path, max_seconds=29.5):
+    """
+    使用 ffmpeg 将音频裁剪到指定秒数。
+    返回输出路径（若失败则返回 None）。
+    """
+    try:
+        os.makedirs(os.path.dirname(dst_path), exist_ok=True)
+        cmd = [
+            "ffmpeg", "-y",
+            "-i", src_path,
+            "-t", f"{max_seconds}",
+            "-c:a", "pcm_s16le",
+            dst_path
+        ]
+        result = subprocess.run(cmd, capture_output=True, text=True)
+        if result.returncode != 0:
+            print(f"[backend.model_trainer] 裁剪音频失败: {result.stderr}")
+            return None
+        return dst_path
+    except Exception as e:
+        print(f"[backend.model_trainer] 裁剪音频异常: {e}")
+        return None
 
 def train_model(data):
     """
@@ -135,12 +161,24 @@ def train_model(data):
                 
                 # 方案B：训练完成后，自动复制提取的音频到 static/uploads/audios/
                 extracted_audio_path = os.path.join(dataset_path, "aud.wav")
+                reference_audio_path = None
+                reference_audio_short = None
+
                 if os.path.exists(extracted_audio_path):
                     uploads_audio_dir = "static/uploads/audios"
                     os.makedirs(uploads_audio_dir, exist_ok=True)
                     reference_audio_path = os.path.join(uploads_audio_dir, f"{video_name}_reference.wav")
                     shutil.copy2(extracted_audio_path, reference_audio_path)
                     print(f"[backend.model_trainer] 已复制提取的音频到: {reference_audio_path}")
+
+                    # 生成裁剪版，便于 CosyVoice 等 30s 限制的场景
+                    reference_audio_short = os.path.join(uploads_audio_dir, f"{video_name}_reference_short.wav")
+                    trimmed = _trim_audio(reference_audio_path, reference_audio_short, max_seconds=29.5)
+                    if trimmed:
+                        reference_audio_short = trimmed
+                        print(f"[backend.model_trainer] 已生成裁剪版参考音频: {reference_audio_short}")
+                    else:
+                        reference_audio_short = None
                 else:
                     print(f"[backend.model_trainer] 警告: 未找到提取的音频文件: {extracted_audio_path}")
                 
@@ -166,7 +204,7 @@ def train_model(data):
                         print(f"[backend.model_trainer] 复制训练预览视频失败: {e}")
 
                 print(f"[backend.model_trainer] 返回相对路径: {relative_workspace}")
-                return _resp("success", relative_workspace, "训练完成", preview_video)
+                return _resp("success", relative_workspace, "训练完成", preview_video, reference_audio_path, reference_audio_short)
             else:
                 print(f"[backend.model_trainer] 训练失败，退出码: {result.returncode}")
                 return _resp("error", None, f"训练失败，退出码: {result.returncode}")
