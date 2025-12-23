@@ -3,11 +3,12 @@ import os
 import time
 import shutil
 
-def _resp(status, model_path=None, message=""):
+def _resp(status, model_path=None, message="", preview_video=None):
     return {
         "status": status,
         "model_path": model_path,
-        "message": message
+        "message": message,
+        "preview_video": preview_video
     }
 
 def train_model(data):
@@ -149,8 +150,23 @@ def train_model(data):
                 if relative_workspace.startswith('..'):
                     # 如果相对路径计算失败，使用简单方法
                     relative_workspace = workspace.replace('TalkingGaussian/', '').lstrip('/')
+                # 训练预览无声视频（训练脚本生成的 out.mp4）
+                preview_src = os.path.join(workspace, "test", "ours_None", "renders", "out.mp4")
+                preview_video = None
+                if os.path.exists(preview_src):
+                    preview_dir = os.path.join("static", "videos")
+                    os.makedirs(preview_dir, exist_ok=True)
+                    preview_name = f"{video_name}_train_preview.mp4"
+                    preview_dst = os.path.join(preview_dir, preview_name)
+                    try:
+                        shutil.copy2(preview_src, preview_dst)
+                        preview_video = preview_dst.replace('\\', '/')
+                        print(f"[backend.model_trainer] 已复制训练预览视频到: {preview_video}")
+                    except Exception as e:
+                        print(f"[backend.model_trainer] 复制训练预览视频失败: {e}")
+
                 print(f"[backend.model_trainer] 返回相对路径: {relative_workspace}")
-                return _resp("success", relative_workspace, "训练完成")
+                return _resp("success", relative_workspace, "训练完成", preview_video)
             else:
                 print(f"[backend.model_trainer] 训练失败，退出码: {result.returncode}")
                 return _resp("error", None, f"训练失败，退出码: {result.returncode}")

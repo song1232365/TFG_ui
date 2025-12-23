@@ -55,14 +55,16 @@ def train_model_async(data, task_id):
             training_tasks[task_id] = {
                 'status': result.get('status', 'error'),
                 'model_path': result.get('model_path'),
-                'message': result.get('message', '')
+                'message': result.get('message', ''),
+                'preview_video': result.get('preview_video')
             }
         else:
             # 兼容旧返回：只返回路径则认为成功
             training_tasks[task_id] = {
                 'status': 'success',
                 'model_path': result,
-                'message': f'训练完成，模型路径：{result}'
+                'message': f'训练完成，模型路径：{result}',
+                'preview_video': None
             }
     except Exception as e:
         training_tasks[task_id] = {
@@ -281,4 +283,4 @@ def upload_au():
 if __name__ == '__main__':
     # host='0.0.0.0' 允许从外部访问（华为云服务器需要）
     # debug=True 开发模式，生产环境应设置为False
-    app.run(debug=True, host='0.0.0.0', port=5001)
+    app.run(debug=True, host='0.0.0.0', port=5002)
