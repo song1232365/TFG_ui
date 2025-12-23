@@ -51,12 +51,12 @@ def train_model(data):
             else:
                 # 原有逻辑：从视频路径推断数据目录
                 video_dir = os.path.dirname(video_path)
-                
-                # 如果视频路径不包含完整路径，尝试构建
-                if not os.path.isabs(video_path) and not video_path.startswith('TalkingGaussian/'):
-                    dataset_path = os.path.join("TalkingGaussian", "data", video_name)
-                else:
-                    dataset_path = video_dir
+            
+            # 如果视频路径不包含完整路径，尝试构建
+            if not os.path.isabs(video_path) and not video_path.startswith('TalkingGaussian/'):
+                dataset_path = os.path.join("TalkingGaussian", "data", video_name)
+            else:
+                dataset_path = video_dir
             
             # 检查数据是否已预处理（检查 transforms_train.json）
             transforms_file = os.path.join(dataset_path, "transforms_train.json")
