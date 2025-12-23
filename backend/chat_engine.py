@@ -10,6 +10,7 @@ from backend.llm_service import query_llm
 PRESET_VOICES = {
     "default": "./CosyVoice/asset/zero_shot_prompt.wav",
     "cross_lingual": "./CosyVoice/asset/cross_lingual_prompt.wav",
+    "may": "./static/uploads/audios/may_reference.wav",  # 从 May 视频提取的音频
     # 可以继续添加更多预设音色
     # "voice1": "./CosyVoice/asset/voice1.wav",
     # "voice2": "./CosyVoice/asset/voice2.wav",
