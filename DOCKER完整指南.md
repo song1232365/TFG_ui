@@ -20,11 +20,63 @@
 
 ### 1.1 环境要求
 
-- **操作系统**：Ubuntu 20.04+ / CentOS 7+
+- **操作系统**：Ubuntu 20.04+ / CentOS 7+ / Windows 10/11（64位）
 - **Docker**：20.10+
 - **Docker Compose**：1.29+（可选）
-- **NVIDIA Docker**：支持 GPU（`nvidia-docker2`）
+- **NVIDIA Docker**：支持 GPU
+  - Linux：`nvidia-docker2`
+  - Windows：Docker Desktop with WSL 2
 - **GPU**：支持 CUDA 11.8+（推荐 NVIDIA GPU，至少 8GB 显存）
+
+### 1.1.1 Windows系统：Docker Desktop启动（重要！）
+
+**在Windows系统上，必须先启动Docker Desktop才能使用Docker命令。**
+
+#### 启动Docker Desktop
+
+**方法1：通过开始菜单**
+1. 打开"开始"菜单
+2. 搜索"Docker Desktop"并启动
+
+**方法2：通过命令行**
+```powershell
+Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
+```
+
+**方法3：通过系统托盘**
+- 查找系统托盘中的Docker图标并点击
+
+#### 等待启动完成
+
+- Docker Desktop启动需要30秒到2分钟
+- 系统托盘图标从"正在启动"变为"运行中"（绿色）
+- 启动完成后才能使用Docker命令
+
+#### 验证Docker可用
+
+```powershell
+# 验证Docker是否运行
+docker ps
+
+# 检查版本
+docker --version
+```
+
+**常见错误**：
+```
+ERROR: error during connect: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.
+```
+
+**解决方法**：
+- 确保Docker Desktop已完全启动
+- 检查WSL 2是否已安装：`wsl --version`
+- 如果未安装：以管理员身份运行 `wsl --install`，然后重启电脑
+
+#### Windows系统要求
+
+- **Windows版本**：Windows 10 64位（2004+）或 Windows 11
+- **WSL 2**：必须安装（`wsl --install`）
+- **虚拟化**：在BIOS中启用虚拟化功能
 
 ### 1.2 快速安装（推荐）
 
@@ -123,9 +175,69 @@ sudo docker run --rm --gpus all nvidia/cuda:11.8.0-base-ubuntu22.04 nvidia-smi
 
 ### 2.2 构建主镜像
 
+**重要：构建前必须完成以下准备工作**
+
+#### 步骤1：Windows系统 - 启动Docker Desktop
+
+```powershell
+# 确保Docker Desktop正在运行
+docker ps
+
+# 如果报错，启动Docker Desktop
+Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
+# 等待30秒到2分钟，直到Docker Desktop完全启动
+```
+
+#### 步骤2：初始化Git子模块
+
+在构建Docker镜像之前，必须先初始化Git子模块：
+
+**Windows PowerShell**：
+```powershell
+cd "E:\STUDY\0-BIT\5-Y3-1\7-Speech Recognition and Synthesis\TFG_ui\TalkingGaussian"
+
+# 初始化并更新子模块
+git submodule update --init --recursive
+
+# 如果遇到错误：fatal: No url found for submodule path 'xxx' in .gitmodules
+# 请参考"项目配置文档.md"的2.3节进行修复
+
+# 如果子模块目录为空，需要手动克隆（见项目配置文档.md 2.3节）
+
+# 返回项目根目录
+cd ..
+```
+
+**Linux系统**：
 ```bash
 cd /root/TFG_ui
 
+# 进入TalkingGaussian目录
+cd TalkingGaussian
+
+# 初始化并更新子模块
+git submodule update --init --recursive
+
+# 返回项目根目录
+cd ..
+```
+
+#### 步骤3：构建镜像
+
+**Windows PowerShell**：
+```powershell
+# 返回项目根目录
+cd "E:\STUDY\0-BIT\5-Y3-1\7-Speech Recognition and Synthesis\TFG_ui"
+
+# 构建镜像（推荐：保存日志）
+docker build -t tfg_ui:latest -f Dockerfile . 2>&1 | Tee-Object -FilePath build.log
+
+# 或者直接构建
+docker build -t tfg_ui:latest -f Dockerfile .
+```
+
+**Linux系统**：
+```bash
 # 首次构建（建立缓存，约 30-60 分钟）
 docker build -t tfg_ui:latest -f Dockerfile .
 
@@ -138,6 +250,10 @@ docker build --progress=plain -t tfg_ui:latest -f Dockerfile .
 - **代码修改后**：5-15 分钟（复用环境缓存，节省 70-80% 时间）
 
 **镜像大小**：约 15-20 GB（包含所有 conda 环境和依赖）
+
+**常见问题**：
+- 如果构建时提示找不到子模块目录，请确保已执行 `git submodule update --init --recursive`
+- 如果子模块初始化失败，请参考 `项目配置文档.md` 的 2.3 节进行修复
 
 ### 2.3 构建评测镜像
 
