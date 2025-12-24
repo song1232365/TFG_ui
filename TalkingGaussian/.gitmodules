@@ -4,3 +4,9 @@
 [submodule "submodules/diff-gaussian-rasterization"]
 	path = submodules/diff-gaussian-rasterization
 	url = https://github.com/ashawkey/diff-gaussian-rasterization.git
+[submodule "third_party/Wav2Lip"]
+	path = third_party/Wav2Lip
+	url = https://github.com/Rudrabha/Wav2Lip.git
+[submodule "third_party/syncnet_python"]
+	path = third_party/syncnet_python
+	url = https://github.com/joonson/syncnet_python.git

@@ -123,9 +123,29 @@ sudo docker run --rm --gpus all nvidia/cuda:11.8.0-base-ubuntu22.04 nvidia-smi
 
 ### 2.2 构建主镜像
 
+**重要：构建前必须初始化Git子模块**
+
+在构建Docker镜像之前，必须先初始化Git子模块：
+
 ```bash
 cd /root/TFG_ui
 
+# 进入TalkingGaussian目录
+cd TalkingGaussian
+
+# 初始化并更新子模块
+git submodule update --init --recursive
+
+# 如果遇到错误：fatal: No url found for submodule path 'xxx' in .gitmodules
+# 请参考"项目配置文档.md"的2.3节进行修复
+
+# 返回项目根目录
+cd ..
+```
+
+**构建镜像**：
+
+```bash
 # 首次构建（建立缓存，约 30-60 分钟）
 docker build -t tfg_ui:latest -f Dockerfile .
 
@@ -138,6 +158,10 @@ docker build --progress=plain -t tfg_ui:latest -f Dockerfile .
 - **代码修改后**：5-15 分钟（复用环境缓存，节省 70-80% 时间）
 
 **镜像大小**：约 15-20 GB（包含所有 conda 环境和依赖）
+
+**常见问题**：
+- 如果构建时提示找不到子模块目录，请确保已执行 `git submodule update --init --recursive`
+- 如果子模块初始化失败，请参考 `项目配置文档.md` 的 2.3 节进行修复
 
 ### 2.3 构建评测镜像
 
